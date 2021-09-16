@@ -9,6 +9,7 @@
 #include <Windows.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <time.h>
 
 #define WIDTH   18
 #define HEIGHT  10
@@ -26,13 +27,15 @@ int x, y;
 // the current direction. i.e. increment/decrement values for 'worm_x' and 'worm_y'
 int dx, dy;
 
+int plus_x, plus_y;
+
 void initialize(int, int);
 void display();
 bool is_blocked();
 void turn();
 void move();
 void score();
-void point_pos();
+//bool point_collected();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -54,6 +57,21 @@ void initialize(int start_x, int start_y) {
         board[i][0] = board[i][WIDTH - 1] = '#';
     }
 
+    //점수배치
+    //'+'
+    //이거 웨 되노?
+    for (int i = 0; i < 5; i++) {
+        plus_x = (rand() % 8 + 1);
+        plus_y = (rand() % 16 + 1);
+        board[plus_x][plus_y] = '+';
+    }
+    //'-'
+    for (int i = 0; i < 5; i++) {
+        plus_x = (rand() % 8 + 1);
+        plus_y = (rand() % 16 + 1);
+        board[plus_x][plus_y] = '-';
+    }
+
     // 지렁이 초기 위치와 방향
     // initial position & direction of earthworm
     x = start_x;
@@ -72,11 +90,6 @@ void display() {
     }
 }
 
-//점수 배치
-void point_pos() {
-
-}
-
 //지렁이 점수 변환&출력
 void score() {
     int score_worm = 1;
@@ -87,9 +100,9 @@ void score() {
 // 다음 이동할 위치를 조사한다.
 // Investigate the next position in the current direction
 bool is_blocked() {
-    return board[x + dx][y + dy] != ' ';
+    return board[x + dx][y + dy] == '#';
 }
-
+//고치기
 void turn() {
     if (board[x + dx][y] != ' ')
         dx = -dx;
@@ -106,6 +119,7 @@ void move() {
 
 int main(void)
 {
+    srand(time(0));
     initialize(1, 1);
     while (1) {
         while (is_blocked()) {
@@ -113,7 +127,6 @@ int main(void)
         }
         move();
         score();
-        point_pos();
         display();
         Sleep(100);
         system("cls");
