@@ -35,6 +35,9 @@ bool is_blocked();
 void turn();
 void move();
 void score();
+void point_pos();
+bool NUM_corr();
+void reset_point();
 //bool point_collected();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
@@ -55,21 +58,6 @@ void initialize(int start_x, int start_y) {
     // 좌, 우 세로벽 vertical walls
     for (int i = 0; i < HEIGHT; i++) {
         board[i][0] = board[i][WIDTH - 1] = '#';
-    }
-
-    //점수배치
-    //'+'
-    //이거 웨 되노?
-    for (int i = 0; i < 5; i++) {
-        plus_x = (rand() % 8 + 1);
-        plus_y = (rand() % 16 + 1);
-        board[plus_x][plus_y] = '+';
-    }
-    //'-'
-    for (int i = 0; i < 5; i++) {
-        plus_x = (rand() % 8 + 1);
-        plus_y = (rand() % 16 + 1);
-        board[plus_x][plus_y] = '-';
     }
 
     // 지렁이 초기 위치와 방향
@@ -117,6 +105,43 @@ void move() {
     board[x][y] = '@';
 }
 
+//점수배치
+void point_pos() {
+    //'+'
+    //이거 웨 되노?
+    for (int i = 0; i < 5; i++) {
+        plus_x = (rand() % 8 + 1);
+        plus_y = (rand() % 16 + 1);
+        board[plus_x][plus_y] = '+';
+    }
+    //'-'
+    for (int i = 0; i < 5; i++) {
+        plus_x = (rand() % 8 + 1);
+        plus_y = (rand() % 16 + 1);
+        board[plus_x][plus_y] = '-';
+    }
+}
+
+//점수 재배치
+//continue
+void reset_point() {
+    int NUM_point = 0;
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int k = 0; k < WIDTH; k++) {
+            if (board[i][k] == '+' ) {
+                NUM_point++;
+            }
+        }
+    }
+    if (NUM_point != 5) {
+        system("cls");
+        point_pos();
+    }
+    else {
+
+    }
+}
+
 int main(void)
 {
     srand(time(0));
@@ -125,6 +150,7 @@ int main(void)
         while (is_blocked()) {
             turn();
         }
+        reset_point();
         move();
         score();
         display();
