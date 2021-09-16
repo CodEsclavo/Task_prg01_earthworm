@@ -4,6 +4,7 @@
 // 사실은 각 오브젝트(지렁이, +, -)의 좌표나 상태만 기억하는 편이 더 쉽게 구현할 수 있는데,
 // 시간이 남는 사람은 한번 시도해보기 바람
 
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include <Windows.h>
 #include <stdbool.h>
@@ -30,10 +31,12 @@ void display();
 bool is_blocked();
 void turn();
 void move();
-
+void score();
+void point_pos();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
+
     // 위, 아래 가로벽 horizontal walls
     for (int i = 0; i < WIDTH; i++) {
         board[0][i] = board[HEIGHT - 1][i] = '#';
@@ -69,6 +72,18 @@ void display() {
     }
 }
 
+//점수 배치
+void point_pos() {
+
+}
+
+//지렁이 점수 변환&출력
+void score() {
+    int score_worm = 1;
+    printf("score = %d\n", score_worm);
+
+}
+
 // 다음 이동할 위치를 조사한다.
 // Investigate the next position in the current direction
 bool is_blocked() {
@@ -97,8 +112,10 @@ int main(void)
             turn();
         }
         move();
+        score();
+        point_pos();
         display();
-        Sleep(500);
+        Sleep(100);
         system("cls");
     }
     return 0;
