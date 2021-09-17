@@ -27,18 +27,20 @@ int x, y;
 // the current direction. i.e. increment/decrement values for 'worm_x' and 'worm_y'
 int dx, dy;
 
-int plus_x, plus_y;
+//'+', '-'들의 좌표변수
+int point_x, point_y;
+
+//'+', '-'갯수
+int NUM_pos = 5, NUM_neg = 5;
 
 void initialize(int, int);
 void display();
 bool is_blocked();
 void turn();
 void move();
-void score();
-void point_pos();
-bool NUM_corr();
-void reset_point();
-//bool point_collected();
+void point_loc();
+bool got_point();
+void reloc_point();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -78,21 +80,13 @@ void display() {
     }
 }
 
-//지렁이 점수 변환&출력
-void score() {
-    int score_worm = 1;
-    printf("score = %d\n", score_worm);
-
-}
-
 // 다음 이동할 위치를 조사한다.
 // Investigate the next position in the current direction
 bool is_blocked() {
     return board[x + dx][y + dy] == '#';
 }
-//고치기
 void turn() {
-    if (board[x + dx][y] != ' ')
+    if (board[x + dx][y] == '#')
         dx = -dx;
     else
         dy = -dy;
@@ -105,56 +99,58 @@ void move() {
     board[x][y] = '@';
 }
 
-//점수배치
-void point_pos() {
+//'+', '-'배치
+void point_loc() {
     //'+'
-    //이거 웨 되노?
-    for (int i = 0; i < 5; i++) {
-        plus_x = (rand() % 8 + 1);
-        plus_y = (rand() % 16 + 1);
-        board[plus_x][plus_y] = '+';
+    for (int i = 0; i < NUM_pos; i++) {
+        point_x = (rand() % 8 + 1);
+        point_y = (rand() % 16 + 1);
+        if (board[point_x][point_y] == '@' || board[point_x][point_y] == '+' || board[point_x][point_y] == '-' || board[point_x][point_y] == '#') {
+            while (board[point_x][point_y] != '@' && board[point_x][point_y] == '+' && board[point_x][point_y] != '-' && board[point_x][point_y] != '#') {
+                point_x = (rand() % HEIGHT);
+                point_y = (rand() % WIDTH);
+            }
+        }
+        board[point_x][point_y] = '+';
     }
     //'-'
-    for (int i = 0; i < 5; i++) {
-        plus_x = (rand() % 8 + 1);
-        plus_y = (rand() % 16 + 1);
-        board[plus_x][plus_y] = '-';
+    for (int i = 0; i < NUM_neg; i++) {
+        point_x = (rand() % 8 + 1);
+        point_y = (rand() % 16 + 1);
+        if (board[point_x][point_y] == '@' || board[point_x][point_y] == '+' || board[point_x][point_y] == '-' || board[point_x][point_y] == '#') {
+            while (board[point_x][point_y] != '@' && board[point_x][point_y] != '+' && board[point_x][point_y] != '-' && board[point_x][point_y] != '#') {
+                point_x = (rand() % HEIGHT);
+                point_y = (rand() % WIDTH);
+            }
+        }
+        board[point_x][point_y] = '-';
     }
 }
 
-//점수 재배치
-//continue
-void reset_point() {
-    int NUM_point = 0;
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int k = 0; k < WIDTH; k++) {
-            if (board[i][k] == '+' ) {
-                NUM_point++;
-            }
-        }
-    }
-    if (NUM_point != 5) {
-        system("cls");
-        point_pos();
-    }
-    else {
+//포인트 획득
+bool got_point() {
+    return NUM_pos < 5 || NUM_neg < 5;
+}
+void reloc_point() {
 
-    }
 }
 
 int main(void)
-{
+{   
+    int score_worm = 1;
     srand(time(0));
     initialize(1, 1);
+    point_loc();
     while (1) {
         while (is_blocked()) {
             turn();
         }
-        reset_point();
         move();
-        score();
+        while (got_point()) {
+            reloc_point();
+        }
         display();
-        Sleep(100);
+        Sleep(10);
         system("cls");
     }
     return 0;
