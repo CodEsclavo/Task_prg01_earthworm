@@ -41,7 +41,7 @@ void move();
 void point_loc();
 void reloc_point(char);
 void indct_NUM_point();
-
+void display_score();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -117,8 +117,6 @@ void point_loc() {
 }
 
 //포인트 재배치
-
-
 void reloc_point(char type_point) {
     int reloc_x, reloc_y;
 
@@ -128,39 +126,39 @@ void reloc_point(char type_point) {
     board[reloc_x][reloc_y] = type_point;
 }
 
-// 보충해야할 포인트 종류 탐색기
-void indct_NUM_point() {
-    int remain_pos = 0, remain_neg = 0;
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int k = 0; k < WIDTH; k++) {
-            if (board[i][k] == '+') {
-                remain_pos++;
-            }
-            else if (board[i][k] == '-') {
-                remain_neg++;
-            }
-        }
-    }
-    if (remain_pos != NUM_pos) {
-        reloc_point('+');
-    }
-    else if (remain_neg != NUM_neg) {
-        reloc_point('-');
-    }
-}
+
 
 int main(void)
 {   
-    int score_worm = 1;
+    int score = 1;
     srand(time(0));
     initialize(1, 1);
     point_loc();
     while (1) {
+        printf("score = %d\n", score);
         while (is_blocked()) {
             turn();
         }
         move();
-        indct_NUM_point();
+        int remain_pos = 0, remain_neg = 0;
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int k = 0; k < WIDTH; k++) {
+                if (board[i][k] == '+') {
+                    remain_pos++;
+                }
+                else if (board[i][k] == '-') {
+                    remain_neg++;
+                }
+            }
+        }
+        if (remain_pos != NUM_pos) {
+            score++;
+            reloc_point('+');
+        }
+        else if (remain_neg != NUM_neg) {
+            score--;
+            reloc_point('-');
+        }
         display();
         Sleep(10);
         system("cls");
