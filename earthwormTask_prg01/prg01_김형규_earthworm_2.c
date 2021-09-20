@@ -39,8 +39,9 @@ bool is_blocked();
 void turn();
 void move();
 void point_loc();
-bool got_point();
-void reloc_point();
+void reloc_point(char);
+void indct_NUM_point();
+
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -103,36 +104,49 @@ void move() {
 void point_loc() {
     //'+'
     for (int i = 0; i < NUM_pos; i++) {
-        point_x = (rand() % 8 + 1);
-        point_y = (rand() % 16 + 1);
-        if (board[point_x][point_y] == '@' || board[point_x][point_y] == '+' || board[point_x][point_y] == '-' || board[point_x][point_y] == '#') {
-            while (board[point_x][point_y] != '@' && board[point_x][point_y] == '+' && board[point_x][point_y] != '-' && board[point_x][point_y] != '#') {
-                point_x = (rand() % HEIGHT);
-                point_y = (rand() % WIDTH);
-            }
-        }
+        point_x = rand() % (HEIGHT - 2) + 1;
+        point_y = rand() % (WIDTH - 2) + 1;
         board[point_x][point_y] = '+';
     }
     //'-'
     for (int i = 0; i < NUM_neg; i++) {
-        point_x = (rand() % 8 + 1);
-        point_y = (rand() % 16 + 1);
-        if (board[point_x][point_y] == '@' || board[point_x][point_y] == '+' || board[point_x][point_y] == '-' || board[point_x][point_y] == '#') {
-            while (board[point_x][point_y] != '@' && board[point_x][point_y] != '+' && board[point_x][point_y] != '-' && board[point_x][point_y] != '#') {
-                point_x = (rand() % HEIGHT);
-                point_y = (rand() % WIDTH);
-            }
-        }
+        point_x = rand() % (HEIGHT - 2) + 1;
+        point_y = rand() % (WIDTH - 2) + 1;
         board[point_x][point_y] = '-';
     }
 }
 
-//포인트 획득
-bool got_point() {
-    return NUM_pos < 5 || NUM_neg < 5;
-}
-void reloc_point() {
+//포인트 재배치
 
+
+void reloc_point(char type_point) {
+    int reloc_x, reloc_y;
+
+    reloc_x = rand() % (HEIGHT - 2) + 1;
+    reloc_y = rand() % (WIDTH - 2) + 1;
+
+    board[reloc_x][reloc_y] = type_point;
+}
+
+// 보충해야할 포인트 종류 탐색기
+void indct_NUM_point() {
+    int remain_pos = 0, remain_neg = 0;
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int k = 0; k < WIDTH; k++) {
+            if (board[i][k] == '+') {
+                remain_pos++;
+            }
+            else if (board[i][k] == '-') {
+                remain_neg++;
+            }
+        }
+    }
+    if (remain_pos != NUM_pos) {
+        reloc_point('+');
+    }
+    else if (remain_neg != NUM_neg) {
+        reloc_point('-');
+    }
 }
 
 int main(void)
@@ -146,9 +160,7 @@ int main(void)
             turn();
         }
         move();
-        while (got_point()) {
-            reloc_point();
-        }
+        indct_NUM_point();
         display();
         Sleep(10);
         system("cls");
