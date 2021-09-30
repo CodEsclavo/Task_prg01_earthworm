@@ -29,6 +29,8 @@ int x, y;
 // the current direction. i.e. increment/decrement values for 'worm_x' and 'worm_y'
 int dx, dy;
 
+int dx_add, dy_add;
+
 int point_change = 0;
 
 //'+', '-'들의 좌표변수
@@ -40,15 +42,13 @@ int NUM_pos = 5, NUM_neg = 5;
 void initialize(int, int);
 void display();
 bool is_blocked();
-void turn();
-void add_turn();
+void turn(int);
 void move();
-void add_move(int);
 
 void point_loc();
 int count_remain(char);
 void reloc_point(char);
-void add_worm(int);
+void add_move(int);
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -94,7 +94,10 @@ bool is_blocked() {
     return board[x + dx][y + dy] == '#';
 }
 
-void turn() {
+void turn(int length) {
+    for (int i = 0; i < length; i++) {
+        board[x - i * dx][y - i * dy] = ' ';
+    }
     if (board[x + dx][y] == '#')
         dx = -dx;
     else
@@ -106,10 +109,6 @@ void move() {
     x += dx;
     y += dy;
     board[x][y] = '@';
-}
-
-void add_move(int length) {
-
 }
 
 //'+', '-'배치
@@ -165,11 +164,18 @@ void reloc_point(char type_point) {
     board[reloc_x][reloc_y] = type_point;
 }
 
-void add_worm(int score) {
-    int length = score;
-        for (int i = 1; i < length; i++) {
+//추가된 지렁이의 움직임
+void add_move(int length) {
+    for (int i = 0; i < length; i++) {
+        if (board[x + dx][y + dy] == '#') {
+            board[x - (i + 1) * dx][y - (i + 1) * dy] = ' ';
             board[x - i * dx][y - i * dy] = '@';
         }
+        else {
+            board[x - (i + 1) * dx][y - (i + 1) * dy] = ' ';
+            board[x - i * dx][y - i * dy] = '@';
+        }
+    }
 }
 
 int main(void)
@@ -181,31 +187,24 @@ int main(void)
     point_loc();
     while (1) {
         while (is_blocked()) {
-            turn();
+            turn(length);
         }
-        for (int i = 1; i < length; i++) {
-            if (board[x - i * dx][y - i * dy] == '@') {
-                for (int k = 0; k < i; k++) {
-                    add_move(k);
-                }
-            }
-        }
-        move();
         if (count_remain('+') != NUM_pos) {
             length++;
-            add_worm(length);
             reloc_point('+');
         }
         else if (count_remain('-') != NUM_neg) {
             if (length > 1) {
                 length--;
+                board[x - length * dx][y - length * dy] = ' ';
             }
-            add_worm(length);
             reloc_point('-');
         }
+        move();
+        add_move(length);
         printf("length = %d\n", length);
         display();
-        Sleep(500);
+        Sleep(300);
         system("cls");
     }
     return 0;
