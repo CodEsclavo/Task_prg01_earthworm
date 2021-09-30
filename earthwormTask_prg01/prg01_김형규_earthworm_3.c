@@ -6,7 +6,8 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <Windows.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -28,6 +29,8 @@ int x, y;
 // the current direction. i.e. increment/decrement values for 'worm_x' and 'worm_y'
 int dx, dy;
 
+int point_change = 0;
+
 //'+', '-'들의 좌표변수
 int point_x, point_y;
 
@@ -38,11 +41,14 @@ void initialize(int, int);
 void display();
 bool is_blocked();
 void turn();
+void add_turn();
 void move();
+void add_move(int);
+
 void point_loc();
 int count_remain(char);
 void reloc_point(char);
-
+void add_worm(int);
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -102,6 +108,10 @@ void move() {
     board[x][y] = '@';
 }
 
+void add_move(int length) {
+
+}
+
 //'+', '-'배치
 void point_loc() {
     //'+'
@@ -155,11 +165,16 @@ void reloc_point(char type_point) {
     board[reloc_x][reloc_y] = type_point;
 }
 
-
+void add_worm(int score) {
+    int length = score;
+        for (int i = 1; i < length; i++) {
+            board[x - i * dx][y - i * dy] = '@';
+        }
+}
 
 int main(void)
 {
-    int score = 1;
+    int length = 1;
 
     srand(time(0));
     initialize(1, 1);
@@ -168,18 +183,29 @@ int main(void)
         while (is_blocked()) {
             turn();
         }
+        for (int i = 1; i < length; i++) {
+            if (board[x - i * dx][y - i * dy] == '@') {
+                for (int k = 0; k < i; k++) {
+                    add_move(k);
+                }
+            }
+        }
         move();
         if (count_remain('+') != NUM_pos) {
-            score++;
+            length++;
+            add_worm(length);
             reloc_point('+');
         }
         else if (count_remain('-') != NUM_neg) {
-            score--;
+            if (length > 1) {
+                length--;
+            }
+            add_worm(length);
             reloc_point('-');
         }
-        printf("score = %d\n", score);
+        printf("length = %d\n", length);
         display();
-        Sleep(100);
+        Sleep(500);
         system("cls");
     }
     return 0;

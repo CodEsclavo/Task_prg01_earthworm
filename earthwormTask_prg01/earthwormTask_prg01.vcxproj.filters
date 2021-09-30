@@ -18,5 +18,8 @@
     <ClCompile Include="prg01_김형규_earthworm_2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="prg01_김형규_earthworm_3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
