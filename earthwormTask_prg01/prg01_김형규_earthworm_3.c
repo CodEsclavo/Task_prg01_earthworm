@@ -45,10 +45,12 @@ bool is_blocked();
 void turn(int);
 void move();
 
+void make_tail(int);
 void point_loc();
 int count_remain(char);
 void reloc_point(char);
 void add_move(int);
+void rebuild_walls();
 
 // 게임판과 지렁이 초기화 initialize game baord & earthworm
 void initialize(int start_x, int start_y) {
@@ -94,6 +96,8 @@ bool is_blocked() {
     return board[x + dx][y + dy] == '#';
 }
 
+
+
 void turn(int length) {
     for (int i = 0; i < length; i++) {
         board[x - i * dx][y - i * dy] = ' ';
@@ -102,6 +106,19 @@ void turn(int length) {
         dx = -dx;
     else
         dy = -dy;
+}
+
+void make_tail(int length) {
+    if (board[x - 2 * dx][y] == '#') {
+        for (int i = 2; i < length; i++) {
+            board[x - (i - 2) * -dx][(y - 2 * dy) - (i - 2) * dy] = '@';
+        }
+    }
+    else if (board[x][y - 2 * dy] == '#') {
+        for (int i = 2; i < length; i++) {
+            board[(x - 2 * dx) - (i - 2) * dx][y + (i - 2) * dy] = '@';
+        }
+    }
 }
 
 void move() {
@@ -167,14 +184,18 @@ void reloc_point(char type_point) {
 //추가된 지렁이의 움직임
 void add_move(int length) {
     for (int i = 0; i < length; i++) {
-        if (board[x + dx][y + dy] == '#') {
-            board[x - (i + 1) * dx][y - (i + 1) * dy] = ' ';
-            board[x - i * dx][y - i * dy] = '@';
-        }
-        else {
-            board[x - (i + 1) * dx][y - (i + 1) * dy] = ' ';
-            board[x - i * dx][y - i * dy] = '@';
-        }
+        board[x - (i + 1) * dx][y - (i + 1) * dy] = ' ';
+        board[x - i * dx][y - i * dy] = '@';
+    }
+}
+
+void rebuild_walls() {
+    for (int i = 0; i < WIDTH; i++) {
+        board[0][i] = board[HEIGHT - 1][i] = '#';
+    }
+
+    for (int i = 0; i < HEIGHT; i++) {
+        board[i][0] = board[i][WIDTH - 1] = '#';
     }
 }
 
@@ -202,6 +223,8 @@ int main(void)
         }
         move();
         add_move(length);
+        make_tail(length);
+        rebuild_walls();
         printf("length = %d\n", length);
         display();
         Sleep(300);
